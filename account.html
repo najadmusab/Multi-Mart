@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / My Account</div>
+    <h1>My Account</h1>
+  </div>
+</div>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="account-layout">
+      <nav class="account-sidebar" id="accountNav">
+        <button data-panel="profile" class="active">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4.5 5-6 8-6s6.5 1.5 8 6"/></svg>
+          Profile
+        </button>
+        <button data-panel="orders">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          My Orders
+        </button>
+        <button data-nav-link="wishlist.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4.5 5.6 4c2.1-.3 4 .8 6.4 3 2.4-2.2 4.3-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7-2.5 4.4-10 9.3-10 9.3z"/></svg>
+          Wishlist
+        </button>
+        <button data-panel="addresses">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Addresses
+        </button>
+        <button data-panel="payments">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+          Saved Payments
+        </button>
+        <button data-panel="settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.14.31.22.65.22 1H21a2 2 0 010 4h-.09c-.14.31-.22.65-.22 1z"/></svg>
+          Settings
+        </button>
+        <button data-panel="logout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+          Logout
+        </button>
+      </nav>
+
+      <div>
+        <div class="account-panel" id="panel-profile">
+          <h2>Profile</h2>
+          <form id="profileForm">
+            <div class="form-grid">
+              <div class="form-field"><label for="pName">Full Name</label><input type="text" id="pName"></div>
+              <div class="form-field"><label for="pPhone">Phone</label><input type="tel" id="pPhone"></div>
+              <div class="form-field full"><label for="pEmail">Email</label><input type="email" id="pEmail"></div>
+            </div>
+            <button type="submit" class="btn btn-dark" style="margin-top:18px;">Save Profile</button>
+          </form>
+          <p style="font-size:12.5px; color:var(--ink-soft); margin-top:16px;">This is a demo profile stored on this device. Real accounts require the backend authentication currently in development.</p>
+        </div>
+
+        <div class="account-panel hidden" id="panel-orders">
+          <h2>My Orders</h2>
+          <div id="ordersList"></div>
+          <div class="empty-state" id="ordersEmpty" style="display:none; padding:40px 20px;">
+            <h3>No orders yet</h3>
+            <p>Your completed orders will show up here.</p>
+            <a href="shop.html" class="btn btn-dark">Start Shopping</a>
+          </div>
+        </div>
+
+        <div class="account-panel hidden" id="panel-addresses">
+          <h2>Addresses</h2>
+          <div id="addressList"></div>
+          <div class="empty-state" id="addressEmpty" style="display:none; padding:40px 20px;">
+            <h3>No saved addresses</h3>
+            <p>Addresses you use at checkout will be saved here automatically.</p>
+          </div>
+        </div>
+
+        <div class="account-panel hidden" id="panel-payments">
+          <h2>Saved Payments</h2>
+          <div class="empty-state" style="padding:40px 20px;">
+            <h3>No saved payment methods</h3>
+            <p>For your security, card and bank details are never stored in this browser. You'll choose a payment method at checkout each time.</p>
+          </div>
+        </div>
+
+        <div class="account-panel hidden" id="panel-settings">
+          <h2>Settings</h2>
+          <div class="settings-row">
+            <div>
+              <div class="label">Email order updates</div>
+              <div class="desc">Receive order confirmations and shipping updates by email.</div>
+            </div>
+            <button class="toggle" id="toggleEmail" type="button"></button>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="label">SMS order updates</div>
+              <div class="desc">Receive delivery updates by text message.</div>
+            </div>
+            <button class="toggle" id="toggleSms" type="button"></button>
+          </div>
+        </div>
+
+        <div class="account-panel hidden" id="panel-logout">
+          <h2>Logout</h2>
+          <p style="color:var(--ink-soft); font-size:14px;">This clears your saved profile details from this device. Your cart, wishlist and order history stay intact.</p>
+          <button class="btn btn-outline" id="logoutBtn" style="margin-top:16px;">Confirm Logout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('account');
+  renderFooter();
+
+  // sidebar navigation
+  document.getElementById('accountNav').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    if(btn.dataset.navLink){ window.location.href = btn.dataset.navLink; return; }
+    document.querySelectorAll('#accountNav button[data-panel]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.account-panel').forEach(p => p.classList.add('hidden'));
+    document.getElementById('panel-' + btn.dataset.panel).classList.remove('hidden');
+  });
+
+  // profile
+  const profile = getProfile();
+  document.getElementById('pName').value = profile.name || '';
+  document.getElementById('pPhone').value = profile.phone || '';
+  document.getElementById('pEmail').value = profile.email || '';
+  document.getElementById('profileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    saveProfile({
+      name: document.getElementById('pName').value.trim(),
+      phone: document.getElementById('pPhone').value.trim(),
+      email: document.getElementById('pEmail').value.trim(),
+    });
+    showToast('Profile saved');
+  });
+
+  // orders
+  const orders = getOrders();
+  if(orders.length === 0){
+    document.getElementById('ordersEmpty').style.display = '';
+  } else {
+    document.getElementById('ordersList').innerHTML = orders.map(o => {
+      const itemCount = o.items.reduce((s,i)=>s+i.quantity,0);
+      const pillClass = o.status === 'Cancelled' ? 'cancelled' : o.status === 'Confirmed' ? 'pending' : '';
+      return `
+      <div class="order-row">
+        <div>
+          <div class="order-id">${o.orderNumber}</div>
+          <div class="order-meta">${new Date(o.placedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})} · ${itemCount} item${itemCount===1?'':'s'} · ${formatPrice(o.total)}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="order-status-pill ${pillClass}">${o.status}</span>
+          <a href="tracking.html?order=${encodeURIComponent(o.orderNumber)}" class="btn btn-outline btn-sm">Track</a>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // addresses
+  const addresses = getAddresses();
+  if(addresses.length === 0){
+    document.getElementById('addressEmpty').style.display = '';
+  } else {
+    document.getElementById('addressList').innerHTML = addresses.map(a => `
+      <div class="address-card">
+        <div class="name">${a.fullName}</div>
+        <div class="lines">${a.address}<br>${a.city}, ${a.state} — ${a.pincode}<br>${a.phone}</div>
+      </div>`).join('');
+  }
+
+  // settings
+  const settings = getSettings();
+  function renderToggle(el, on){ el.classList.toggle('on', on); }
+  renderToggle(document.getElementById('toggleEmail'), settings.emailUpdates);
+  renderToggle(document.getElementById('toggleSms'), settings.smsUpdates);
+  document.getElementById('toggleEmail').addEventListener('click', () => {
+    settings.emailUpdates = !settings.emailUpdates;
+    saveSettings(settings);
+    renderToggle(document.getElementById('toggleEmail'), settings.emailUpdates);
+  });
+  document.getElementById('toggleSms').addEventListener('click', () => {
+    settings.smsUpdates = !settings.smsUpdates;
+    saveSettings(settings);
+    renderToggle(document.getElementById('toggleSms'), settings.smsUpdates);
+  });
+
+  // logout
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    clearProfile();
+    document.getElementById('pName').value = '';
+    document.getElementById('pPhone').value = '';
+    document.getElementById('pEmail').value = '';
+    showToast('Logged out — profile cleared from this device');
+  });
+</script>
+</body>
+</html>

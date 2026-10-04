@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Order — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Track Order</div>
+    <h1>Track Your Order</h1>
+  </div>
+</div>
+
+<section class="section-tight">
+  <div class="container">
+
+    <div class="track-lookup">
+      <input type="text" id="orderIdInput" placeholder="Enter your Order ID (e.g. DD482913)">
+      <button class="btn btn-dark" id="trackLookupBtn">Track</button>
+    </div>
+
+    <div id="noOrdersMsg" style="display:none; color:var(--ink-soft); font-size:14px; margin-bottom:24px;">
+      You don't have any orders on this device yet. <a href="shop.html" style="color:var(--pine); text-decoration:underline;">Start shopping</a>.
+    </div>
+
+    <div id="orderPicker" style="margin-bottom:32px; display:none;">
+      <label style="font-size:13px; font-weight:600; display:block; margin-bottom:8px;">Or choose from your recent orders</label>
+      <select class="sort-select" id="orderSelect" style="max-width:340px;"></select>
+    </div>
+
+    <div id="trackResult" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; margin-bottom:28px;">
+        <div>
+          <div style="font-size:12.5px; color:var(--ink-soft);">Order</div>
+          <div style="font-weight:700; font-size:18px;" id="rOrderId"></div>
+          <div style="font-size:12.5px; color:var(--ink-soft); margin-top:4px;" id="rOrderDate"></div>
+        </div>
+        <div>
+          <span class="order-status-pill" id="rStatusPill"></span>
+        </div>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+
+      <div class="admin-card" style="margin-top:36px; max-width:520px;">
+        <h3>Items in this order</h3>
+        <div id="rItems"></div>
+      </div>
+    </div>
+
+    <div id="notFoundMsg" class="empty-state" style="display:none;">
+      <h3>Order not found</h3>
+      <p>Double check the Order ID and try again.</p>
+    </div>
+
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('shop');
+  renderFooter();
+
+  const STAGES = ['Confirmed','Processing','Packed','Shipped','Out for Delivery','Delivered'];
+
+  const orders = getOrders();
+  if(orders.length === 0){
+    document.getElementById('noOrdersMsg').style.display = '';
+  } else {
+    document.getElementById('orderPicker').style.display = '';
+    document.getElementById('orderSelect').innerHTML =
+      '<option value="">Select an order...</option>' +
+      orders.map(o => `<option value="${o.orderNumber}">${o.orderNumber} — ${formatPrice(o.total)}</option>`).join('');
+  }
+
+  function showOrder(orderNumber){
+    const order = getOrderByNumber(orderNumber);
+    document.getElementById('trackResult').style.display = 'none';
+    document.getElementById('notFoundMsg').style.display = 'none';
+    if(!order){
+      if(orderNumber) document.getElementById('notFoundMsg').style.display = '';
+      return;
+    }
+    document.getElementById('trackResult').style.display = '';
+    document.getElementById('rOrderId').textContent = order.orderNumber;
+    document.getElementById('rOrderDate').textContent = 'Placed on ' + new Date(order.placedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+
+    const pill = document.getElementById('rStatusPill');
+    pill.textContent = order.status;
+    pill.className = 'order-status-pill' + (order.status === 'Cancelled' ? ' cancelled' : order.status === 'Confirmed' ? ' pending' : '');
+
+    const currentIdx = STAGES.indexOf(order.status);
+    document.getElementById('timeline').innerHTML = STAGES.map((stage, i) => {
+      const done = i < currentIdx;
+      const current = i === currentIdx;
+      const icon = done
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>'
+        : '';
+      return `
+      <div class="t-step ${done?'done':''} ${current?'current':''}">
+        <div class="t-dot">${icon}</div>
+        <div class="t-line"></div>
+        <div>
+          <div class="t-label">${stage}</div>
+          ${current ? `<div class="t-time">Current status</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('rItems').innerHTML = order.items.map(item => `
+      <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line);">
+        <img src="${item.image}" alt="${item.name}" style="width:44px; height:44px; object-fit:cover; border-radius:4px;">
+        <div style="flex:1;">
+          <div style="font-size:13.5px; font-weight:600;">${item.name}</div>
+          <div style="font-size:12px; color:var(--ink-soft);">Qty ${item.quantity} × ${formatPrice(item.price)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  document.getElementById('trackLookupBtn').addEventListener('click', () => {
+    showOrder(document.getElementById('orderIdInput').value.trim());
+  });
+  document.getElementById('orderIdInput').addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') showOrder(document.getElementById('orderIdInput').value.trim());
+  });
+  const orderSelectEl = document.getElementById('orderSelect');
+  if(orderSelectEl){
+    orderSelectEl.addEventListener('change', (e) => {
+      document.getElementById('orderIdInput').value = e.target.value;
+      showOrder(e.target.value);
+    });
+  }
+
+  // if arriving from confirmation.html with ?order=, show it immediately
+  const params = new URLSearchParams(window.location.search);
+  const preselect = params.get('order');
+  if(preselect){
+    document.getElementById('orderIdInput').value = preselect;
+    if(orderSelectEl) orderSelectEl.value = preselect;
+    showOrder(preselect);
+  }
+</script>
+</body>
+</html>

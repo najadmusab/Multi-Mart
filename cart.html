@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Cart — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Cart</div>
+    <h1>Your Cart</h1>
+  </div>
+</div>
+
+<section class="section-tight">
+  <div class="container">
+
+    <div id="cartFilled" style="display:none;">
+      <div class="cart-layout">
+        <div class="cart-list" id="cartList"></div>
+
+        <div class="summary-box">
+          <h3>Order Summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span id="sumSubtotal"></span></div>
+          <div class="summary-row"><span>Shipping</span><span id="sumShipping"></span></div>
+          <div class="summary-row" id="discountRow" style="display:none;"><span>Discount</span><span id="sumDiscount"></span></div>
+          <div class="summary-row total"><span>Total</span><span id="sumTotal"></span></div>
+
+          <div class="coupon-row">
+            <input type="text" id="couponInput" placeholder="Coupon code (try SAVE10)">
+            <button class="btn btn-outline btn-sm" id="applyCoupon">Apply</button>
+          </div>
+          <div class="coupon-msg" id="couponMsg"></div>
+
+          <a href="checkout.html" class="btn btn-primary btn-block" id="checkoutBtn">Proceed to Checkout</a>
+          <a href="shop.html" class="btn btn-outline btn-block" style="margin-top:10px;">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="cartEmpty" style="display:none;">
+      <h3>Your cart is empty</h3>
+      <p>Looks like you haven't added anything yet.</p>
+      <a href="shop.html" class="btn btn-dark">Start Shopping</a>
+    </div>
+
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('shop');
+  renderFooter();
+
+  let couponCode = getCoupon();
+
+  function cartRowHTML(line){
+    const p = line.product;
+    return `
+    <div class="cart-row" data-id="${p.id}">
+      <img src="${p.images[0]}" alt="${p.name}">
+      <div>
+        <a class="name" href="product.html?id=${p.id}">${p.name}</a>
+        <div class="meta">${p.brand} · ${categoryName(p.category)}</div>
+        <div class="unit-price">${formatPrice(p.price)} each</div>
+      </div>
+      <div class="qty-selector">
+        <button class="qty-dec" aria-label="Decrease">−</button>
+        <span class="qty-value">${line.quantity}</span>
+        <button class="qty-inc" aria-label="Increase">+</button>
+      </div>
+      <div class="subtotal">${formatPrice(line.lineTotal)}</div>
+      <button class="remove-btn" aria-label="Remove">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2m-8 0v12a2 2 0 002 2h4a2 2 0 002-2V7"/></svg>
+      </button>
+    </div>`;
+  }
+
+  function render(){
+    const { lines, subtotal, shipping, discount, total } = getCartTotals(couponCode);
+
+    if(lines.length === 0){
+      document.getElementById('cartFilled').style.display = 'none';
+      document.getElementById('cartEmpty').style.display = '';
+      return;
+    }
+    document.getElementById('cartFilled').style.display = '';
+    document.getElementById('cartEmpty').style.display = 'none';
+
+    document.getElementById('cartList').innerHTML = lines.map(cartRowHTML).join('');
+    document.getElementById('sumSubtotal').textContent = formatPrice(subtotal);
+    document.getElementById('sumShipping').textContent = shipping === 0 ? 'Free' : formatPrice(shipping);
+    document.getElementById('sumTotal').textContent = formatPrice(total);
+
+    const discountRow = document.getElementById('discountRow');
+    if(discount > 0){
+      discountRow.style.display = '';
+      document.getElementById('sumDiscount').textContent = '−' + formatPrice(discount);
+    } else {
+      discountRow.style.display = 'none';
+    }
+  }
+
+  document.getElementById('cartList').addEventListener('click', (e) => {
+    const row = e.target.closest('.cart-row');
+    if(!row) return;
+    const id = Number(row.dataset.id);
+
+    if(e.target.closest('.qty-inc')){
+      const product = getProductById(id);
+      const cart = getCart();
+      const item = cart.find(i => i.id === id);
+      if(item && product && item.quantity < product.stock){
+        setCartQuantity(id, item.quantity + 1);
+        render();
+      } else {
+        showToast('No more stock available');
+      }
+    } else if(e.target.closest('.qty-dec')){
+      const cart = getCart();
+      const item = cart.find(i => i.id === id);
+      if(item && item.quantity > 1){
+        setCartQuantity(id, item.quantity - 1);
+        render();
+      }
+    } else if(e.target.closest('.remove-btn')){
+      removeFromCart(id);
+      render();
+      showToast('Item removed from cart');
+    }
+  });
+
+  document.getElementById('applyCoupon').addEventListener('click', () => {
+    const val = document.getElementById('couponInput').value.trim().toUpperCase();
+    const msg = document.getElementById('couponMsg');
+    if(!val){ return; }
+    if(COUPONS[val]){
+      couponCode = val;
+      setCoupon(val);
+      msg.textContent = `"${val}" applied — ${COUPONS[val].label}.`;
+      msg.className = 'coupon-msg ok';
+    } else {
+      couponCode = null;
+      setCoupon(null);
+      msg.textContent = 'Invalid or expired coupon code.';
+      msg.className = 'coupon-msg err';
+    }
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

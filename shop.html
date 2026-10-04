@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Daily Deals</title>
+<meta name="description" content="Browse the full Daily Deals collection — skincare, electronics, home, fashion, beauty and accessories.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<style>
+  /* sliding scroll-reveal */
+  .reveal{ opacity:0; transform:translateY(36px); transition:opacity 620ms cubic-bezier(.16,.84,.44,1), transform 620ms cubic-bezier(.16,.84,.44,1); }
+  .reveal.reveal-left{ transform:translateX(-40px); }
+  .reveal.reveal-right{ transform:translateX(40px); }
+  .reveal.in{ opacity:1; transform:translate(0,0); }
+  #drawerFilterContent .filter-panel.in-drawer{ position:static; border:none; padding:0; top:auto; display:block; }
+</style>
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Shop</div>
+    <h1>Shop</h1>
+    <p class="sub">Discover our collection</p>
+  </div>
+</div>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="shop-layout">
+
+      <aside class="filter-panel" id="filterPanel">
+        <h3>Filters</h3>
+        <div class="filter-group">
+          <h4>Category</h4>
+          <div id="categoryFilters"></div>
+        </div>
+        <div class="filter-group">
+          <h4>Price</h4>
+          <input type="range" min="0" max="3000" step="50" value="3000" class="price-range" id="priceRange">
+          <div class="price-range-labels"><span>₹0</span><span id="priceRangeLabel">₹3,000</span></div>
+        </div>
+        <div class="filter-group">
+          <h4>Availability</h4>
+          <label class="filter-check"><input type="checkbox" id="inStockOnly"> In Stock</label>
+          <label class="filter-check"><input type="checkbox" id="onSaleOnly"> On Sale</label>
+        </div>
+        <div class="filter-group">
+          <h4>Rating</h4>
+          <div id="ratingFilters"></div>
+        </div>
+        <a href="#" class="clear-filters" id="clearFilters">Clear all filters</a>
+      </aside>
+
+      <div>
+        <div class="shop-toolbar reveal" style="flex-direction:column; align-items:stretch; gap:16px;">
+          <div class="filter-tabs" id="badgeTabs">
+            <button data-badge="all">All</button>
+            <button data-badge="new">New Arrivals</button>
+            <button data-badge="best">Best Sellers</button>
+            <button data-badge="sale">Deals</button>
+          </div>
+          <div class="shop-toolbar" style="margin-bottom:0;">
+            <span class="result-count" id="resultCount">0 products</span>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <button class="mobile-filter-btn" id="openFilterDrawer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+                Filters
+              </button>
+              <select class="sort-select" id="sortSelect">
+                <option value="featured">Sort: Featured</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+                <option value="rating">Highest Rated</option>
+                <option value="newest">Newest</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="prod-grid" id="shopGrid"></div>
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <h3>No products found</h3>
+          <p>Try changing your filters or search term.</p>
+          <a href="#" class="btn btn-outline" id="emptyClearBtn">Clear filters</a>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<!-- mobile filter drawer -->
+<div class="filter-drawer-backdrop" id="drawerBackdrop"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div class="filter-drawer-head">
+    <h3 class="serif" style="font-size:19px;">Filters</h3>
+    <button class="icon-btn" id="closeFilterDrawer" aria-label="Close filters">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div id="drawerFilterContent"></div>
+</div>
+<div class="filter-drawer-apply" id="drawerApplyBar">
+  <button class="btn btn-primary btn-block" id="applyDrawerFilters">Show results</button>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('shop');
+  renderFooter();
+
+  const PAGE_SIZE = 8;
+  const params = new URLSearchParams(window.location.search);
+
+  const state = {
+    search: params.get('search') || '',
+    categories: params.get('cat') ? [params.get('cat')] : [],
+    maxPrice: 3000,
+    inStock: false,
+    onSale: false,
+    badge: params.get('filter') === 'new' ? 'new' : params.get('filter') === 'best' ? 'best' : params.get('filter') === 'deals' ? 'sale' : 'all',
+    minRating: 0,
+    sort: 'featured',
+    page: 1,
+  };
+
+  function productCard(p){
+    const isSale = !!p.was;
+    const badgeText = p.badge === 'new' ? 'New' : p.badge === 'best' ? 'Best Seller' : (isSale ? Math.round((1-p.price/p.was)*100)+'% OFF' : null);
+    const badge = badgeText ? `<span class="product-tag ${p.badge==='sale'||isSale?'sale':''}">${badgeText}</span>` : '';
+    const priceRow = isSale
+      ? `<span class="price-now">${formatPrice(p.price)}</span><span class="price-was">${formatPrice(p.was)}</span>`
+      : `<span class="price-now">${formatPrice(p.price)}</span>`;
+    const wished = isWishlisted(p.id) ? 'active' : '';
+    const disabled = p.stock < 1;
+    return `
+    <div class="product-card">
+      <a class="product-media" href="product.html?id=${p.id}">
+        ${badge}
+        <button class="wish-btn ${wished}" onclick="event.preventDefault(); handleWish(this,${p.id})" aria-label="Add to wishlist">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4.5 5.6 4c2.1-.3 4 .8 6.4 3 2.4-2.2 4.3-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7-2.5 4.4-10 9.3-10 9.3z"/></svg>
+        </button>
+        <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+      </a>
+      <div class="product-body">
+        <div class="product-brand">${p.brand}</div>
+        <a class="product-name" href="product.html?id=${p.id}">${p.name}</a>
+        <div class="product-rating"><span class="stars">${starString(p.rating)}</span> ${p.rating} (${p.reviews})</div>
+        <div class="product-price">${priceRow}</div>
+        <div class="product-delivery">Delivery in ${p.delivery}</div>
+        <button class="add-btn" ${disabled?'disabled':''} onclick="handleAdd(this,${p.id})">${disabled?'Out of stock':'Add to cart'}</button>
+      </div>
+    </div>`;
+  }
+
+  function handleWish(btn, id){
+    const active = toggleWishlist(id);
+    btn.classList.toggle('active', active);
+    showToast(active ? 'Added to wishlist' : 'Removed from wishlist');
+  }
+  function handleAdd(btn, id){
+    const product = getProductById(id);
+    if(!product || product.stock < 1) return;
+    addToCart(id, 1);
+    const original = btn.textContent;
+    btn.textContent = 'Added';
+    btn.classList.add('added');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('added'); }, 1200);
+    showToast(product.name + ' added to cart');
+  }
+
+  function getFiltered(){
+    let list = PRODUCTS.slice();
+    if(state.search){
+      const q = state.search.toLowerCase();
+      list = list.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+    }
+    if(state.categories.length) list = list.filter(p => state.categories.includes(p.category));
+    list = list.filter(p => p.price <= state.maxPrice);
+    if(state.inStock) list = list.filter(p => p.stock > 0);
+    if(state.onSale) list = list.filter(p => !!p.was);
+    if(state.badge !== 'all') list = list.filter(p => p.badge === state.badge);
+    if(state.minRating) list = list.filter(p => p.rating >= state.minRating);
+
+    if(state.sort === 'price_asc') list.sort((a,b)=>a.price-b.price);
+    else if(state.sort === 'price_desc') list.sort((a,b)=>b.price-a.price);
+    else if(state.sort === 'rating') list.sort((a,b)=>b.rating-a.rating);
+    else if(state.sort === 'newest') list.sort((a,b)=>(b.badge==='new')-(a.badge==='new'));
+    return list;
+  }
+
+  function renderCategoryFilters(){
+    const html = CATEGORIES.map(c => `
+      <label class="filter-check">
+        <input type="checkbox" value="${c.slug}" class="cat-check" ${state.categories.includes(c.slug)?'checked':''}>
+        ${c.name}
+      </label>`).join('');
+    document.getElementById('categoryFilters').innerHTML = html;
+    wireCategoryCheckboxes();
+  }
+
+  function wireCategoryCheckboxes(){
+    document.querySelectorAll('.cat-check').forEach(cb => {
+      cb.checked = state.categories.includes(cb.value);
+      cb.addEventListener('change', () => {
+        if(cb.checked) state.categories.push(cb.value);
+        else state.categories = state.categories.filter(c => c !== cb.value);
+        // sync duplicate checkbox in drawer/panel
+        document.querySelectorAll(`.cat-check[value="${cb.value}"]`).forEach(other => other.checked = cb.checked);
+        state.page = 1;
+        render();
+      });
+    });
+  }
+
+  function renderRatingFilters(){
+    const options = [4,3,2];
+    const html = options.map(r => `
+      <div class="star-filter" data-rating="${r}">
+        <span class="stars">${starString(r)}</span> &amp; up
+      </div>`).join('') + `<div class="star-filter" data-rating="0" style="color:var(--pine); font-weight:600;">Show all</div>`;
+    document.getElementById('ratingFilters').innerHTML = html;
+    document.querySelectorAll('.star-filter').forEach(el => {
+      el.addEventListener('click', () => {
+        state.minRating = Number(el.dataset.rating);
+        state.page = 1;
+        render();
+      });
+    });
+  }
+
+  document.getElementById('priceRange').addEventListener('input', (e) => {
+    state.maxPrice = Number(e.target.value);
+    document.getElementById('priceRangeLabel').textContent = formatPrice(state.maxPrice);
+    state.page = 1;
+    render();
+  });
+  document.getElementById('inStockOnly').addEventListener('change', (e) => { state.inStock = e.target.checked; state.page = 1; render(); });
+  document.getElementById('onSaleOnly').addEventListener('change', (e) => { state.onSale = e.target.checked; state.page = 1; render(); });
+  document.getElementById('sortSelect').addEventListener('change', (e) => { state.sort = e.target.value; render(); });
+
+  document.querySelectorAll('#badgeTabs button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.badge === state.badge);
+    btn.addEventListener('click', () => {
+      state.badge = btn.dataset.badge;
+      state.page = 1;
+      document.querySelectorAll('#badgeTabs button').forEach(b => b.classList.toggle('active', b === btn));
+      render();
+    });
+  });
+
+  document.getElementById('clearFilters').addEventListener('click', (e) => { e.preventDefault(); resetFilters(); });
+  document.getElementById('emptyClearBtn').addEventListener('click', (e) => { e.preventDefault(); resetFilters(); });
+
+  function resetFilters(){
+    state.search = ''; state.categories = []; state.maxPrice = 3000; state.inStock = false; state.onSale = false; state.minRating = 0; state.badge = 'all'; state.page = 1;
+    document.getElementById('priceRange').value = 3000;
+    document.getElementById('priceRangeLabel').textContent = '₹3,000';
+    document.getElementById('inStockOnly').checked = false;
+    document.getElementById('onSaleOnly').checked = false;
+    document.querySelectorAll('#badgeTabs button').forEach(b => b.classList.toggle('active', b.dataset.badge === 'all'));
+    renderCategoryFilters();
+    render();
+  }
+
+  // mobile drawer — reparent the single filter panel rather than duplicating
+  // its controls, so there's exactly one set of checkboxes/IDs on the page.
+  const backdrop = document.getElementById('drawerBackdrop');
+  const drawer = document.getElementById('filterDrawer');
+  const drawerContent = document.getElementById('drawerFilterContent');
+  const applyBar = document.getElementById('drawerApplyBar');
+  const shopLayout = document.querySelector('.shop-layout');
+  const filterPanel = document.getElementById('filterPanel');
+
+  function placeFilterPanel(){
+    if(window.innerWidth <= 900){
+      if(filterPanel.parentElement !== drawerContent){
+        drawerContent.appendChild(filterPanel);
+        filterPanel.classList.add('in-drawer');
+      }
+    } else {
+      if(filterPanel.parentElement !== shopLayout){
+        shopLayout.insertBefore(filterPanel, shopLayout.firstChild);
+        filterPanel.classList.remove('in-drawer');
+      }
+    }
+  }
+  placeFilterPanel();
+  window.addEventListener('resize', placeFilterPanel);
+
+  function openDrawer(){ backdrop.classList.add('open'); drawer.classList.add('open'); applyBar.classList.add('open'); }
+  function closeDrawer(){ backdrop.classList.remove('open'); drawer.classList.remove('open'); applyBar.classList.remove('open'); }
+  document.getElementById('openFilterDrawer').addEventListener('click', openDrawer);
+  document.getElementById('closeFilterDrawer').addEventListener('click', closeDrawer);
+  document.getElementById('applyDrawerFilters').addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+
+  function renderPagination(total){
+    const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
+    const el = document.getElementById('pagination');
+    if(totalPages <= 1){ el.innerHTML=''; return; }
+    let html = '';
+    for(let i=1;i<=totalPages;i++){
+      html += `<button class="${i===state.page?'active':''}" data-p="${i}">${i}</button>`;
+    }
+    el.innerHTML = html;
+    el.querySelectorAll('button').forEach(btn => btn.addEventListener('click', () => {
+      state.page = Number(btn.dataset.p);
+      render();
+      window.scrollTo({ top: document.getElementById('shopGrid').offsetTop - 120, behavior: 'smooth' });
+    }));
+  }
+
+  function applySlideReveal(container){
+    const cards = container.querySelectorAll('.product-card');
+    cards.forEach((card, i) => {
+      card.classList.add('reveal');
+      card.style.transitionDelay = (i % PAGE_SIZE) * 45 + 'ms';
+    });
+    if('IntersectionObserver' in window){
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if(entry.isIntersecting){
+            entry.target.classList.add('in');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      cards.forEach(c => io.observe(c));
+    } else {
+      cards.forEach(c => c.classList.add('in'));
+    }
+  }
+
+  function render(){
+    const filtered = getFiltered();
+    document.getElementById('resultCount').textContent = filtered.length + (filtered.length===1?' product':' products');
+
+    const start = (state.page - 1) * PAGE_SIZE;
+    const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+    const grid = document.getElementById('shopGrid');
+    grid.innerHTML = pageItems.map(productCard).join('');
+    document.getElementById('emptyState').style.display = filtered.length ? 'none' : '';
+    grid.style.display = filtered.length ? '' : 'none';
+
+    renderPagination(filtered.length);
+    applySlideReveal(grid);
+  }
+
+  renderCategoryFilters();
+  renderRatingFilters();
+  render();
+
+  // general page-level slide reveal (toolbar, sidebar already have .reveal classes)
+  const generalReveal = document.querySelectorAll('.reveal:not(.product-card)');
+  if('IntersectionObserver' in window){
+    const io2 = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if(entry.isIntersecting){ entry.target.classList.add('in'); io2.unobserve(entry.target); } });
+    }, { threshold: 0.1 });
+    generalReveal.forEach(el => io2.observe(el));
+  } else {
+    generalReveal.forEach(el => el.classList.add('in'));
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body style="background:var(--paper);">
+
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path d="M12 2C8 4 5 8 5 13a7 7 0 0014 0c0-5-3-9-7-11z" fill="#F1EADC"/><path d="M12 22V11" stroke="#152920" stroke-width="1.4"/></svg>
+      Daily Deals <span style="font-weight:400; font-size:12px; opacity:0.7;">Admin</span>
+    </div>
+    <nav id="adminNav">
+      <button data-panel="dashboard" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </button>
+      <button data-panel="products">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>
+        Products
+      </button>
+      <button data-panel="orders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        Orders
+      </button>
+      <button data-panel="customers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20c1-3.5 3.7-5.5 6.5-5.5s5.5 2 6.5 5.5"/><circle cx="18" cy="9" r="2.6"/><path d="M15.7 14.8c2 .3 3.7 1.9 4.4 4.2"/></svg>
+        Customers
+      </button>
+      <button data-panel="categories">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+        Categories
+      </button>
+      <button data-panel="inventory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7l9-4 9 4-9 4-9-4z"/><path d="M3 7v10l9 4 9-4V7"/><path d="M12 11v10"/></svg>
+        Inventory
+      </button>
+      <button data-panel="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.65 1.65 0 004.6 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.6a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06A1.65 1.65 0 0019.4 9c.14.31.22.65.22 1H21a2 2 0 010 4h-.09c-.14.31-.22.65-.22 1z"/></svg>
+        Settings
+      </button>
+    </nav>
+    <div style="padding:18px 22px 0;">
+      <a href="index.html" style="font-size:12.5px; color:#9FAC9F;">← Back to storefront</a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <h1 id="adminTitle">Dashboard</h1>
+      <div style="font-size:13px; color:var(--ink-soft);">Signed in as <strong style="color:var(--ink);">Admin</strong></div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="admin-panel-view active" id="view-dashboard">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="label">Total Products</div><div class="value" id="statTotalProducts">0</div></div>
+        <div class="stat-card"><div class="label">In Stock</div><div class="value" id="statInStock">0</div></div>
+        <div class="stat-card"><div class="label">Low Stock</div><div class="value" id="statLowStock">0</div></div>
+        <div class="stat-card"><div class="label">Out of Stock</div><div class="value" id="statOutOfStock">0</div></div>
+        <div class="stat-card"><div class="label">Total Orders</div><div class="value" id="statOrders">0</div></div>
+        <div class="stat-card"><div class="label">Total Revenue</div><div class="value" id="statRevenue">₹0</div></div>
+        <div class="stat-card"><div class="label">Customers</div><div class="value" id="statCustomers">0</div></div>
+      </div>
+
+      <div class="admin-card">
+        <h3>Recent Orders</h3>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Order ID</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+            <tbody id="recentOrdersBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="dashNoOrders" style="display:none; padding:40px 0;">
+          <h3>No orders yet</h3>
+          <p>Orders placed on the storefront will appear here.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="admin-panel-view" id="view-products">
+      <div class="admin-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:18px;">
+          <div>
+            <h3 style="margin-bottom:4px;">Product Catalog</h3>
+            <p style="font-size:12.5px; color:var(--ink-soft);">Changes here save immediately and are what Shop, Product Details, Search and Cart all read.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="openAddProduct">+ Add Product</button>
+        </div>
+
+        <input type="text" id="productSearch" placeholder="Search by name, ID, brand or category..."
+          style="width:100%; max-width:420px; padding:10px 14px; border:1px solid var(--line); border-radius:var(--radius-s); font-family:inherit; font-size:13.5px; margin-bottom:14px;">
+
+        <div class="filter-tabs" id="productStatusTabs" style="margin-bottom:16px;">
+          <button class="active" data-status="all">All</button>
+          <button data-status="in">In Stock</button>
+          <button data-status="low">Low Stock</button>
+          <button data-status="out">Out of Stock</button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th></th><th>Product</th><th>ID</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="productsEmpty" style="display:none; padding:40px 0;">
+          <h3>No products match your search</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / Edit Product modal -->
+    <div id="productModalBackdrop" style="display:none; position:fixed; inset:0; background:rgba(21,20,17,0.5); z-index:90; align-items:center; justify-content:center; padding:20px;">
+      <div class="admin-card" style="max-width:600px; width:100%; max-height:88vh; overflow-y:auto; margin-bottom:0;">
+        <h3 id="productModalTitle">Add Product</h3>
+        <form id="productForm" novalidate>
+          <input type="hidden" id="pf_id">
+
+          <p style="font-size:13px; font-weight:700; color:var(--ink-soft); margin:18px 0 10px; text-transform:uppercase; letter-spacing:0.04em;">Product Information</p>
+          <div class="form-grid">
+            <div class="form-field full"><label for="pf_name">Product Name</label><input type="text" id="pf_name" required></div>
+            <div class="form-field">
+              <label for="pf_idDisplay">Product ID</label>
+              <input type="text" id="pf_idDisplay" disabled style="background:var(--paper-alt); color:var(--ink-soft);">
+            </div>
+            <div class="form-field"><label for="pf_brand">Brand</label><input type="text" id="pf_brand" value="Daily Deals"></div>
+            <div class="form-field">
+              <label for="pf_category">Category</label>
+              <select id="pf_category" required></select>
+            </div>
+            <div class="form-field full"><label for="pf_short">Short description</label><input type="text" id="pf_short"></div>
+            <div class="form-field full"><label for="pf_desc">Full description</label><input type="text" id="pf_desc"></div>
+          </div>
+
+          <p style="font-size:13px; font-weight:700; color:var(--ink-soft); margin:22px 0 10px; text-transform:uppercase; letter-spacing:0.04em;">Pricing</p>
+          <div class="form-grid">
+            <div class="form-field"><label for="pf_price">Selling Price (₹)</label><input type="number" id="pf_price" min="1" required></div>
+            <div class="form-field"><label for="pf_was">Original Price (₹, optional)</label><input type="number" id="pf_was" min="1"></div>
+            <div class="form-field full"><label>Discount</label>
+              <div id="pf_discountDisplay" style="padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-s); background:var(--paper-alt); font-size:14px; color:var(--ink-soft);">No discount</div>
+            </div>
+          </div>
+
+          <p style="font-size:13px; font-weight:700; color:var(--ink-soft); margin:22px 0 10px; text-transform:uppercase; letter-spacing:0.04em;">Images</p>
+          <div class="form-grid">
+            <div class="form-field full"><label for="pf_image">Main Product Image (image URL or path)</label><input type="text" id="pf_image" placeholder="https://... or assets/products/example.jpg" required></div>
+            <div class="form-field full"><label for="pf_extraImages">Additional Images (one URL per line, optional)</label>
+              <textarea id="pf_extraImages" rows="2" style="width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-s); font-family:inherit; font-size:14px;"></textarea>
+            </div>
+          </div>
+
+          <p style="font-size:13px; font-weight:700; color:var(--ink-soft); margin:22px 0 10px; text-transform:uppercase; letter-spacing:0.04em;">Inventory</p>
+          <div class="form-grid">
+            <div class="form-field"><label for="pf_stock">Stock Quantity</label><input type="number" id="pf_stock" min="0" required></div>
+            <div class="form-field"><label for="pf_lowStock">Low Stock Threshold</label><input type="number" id="pf_lowStock" min="0" value="10"></div>
+            <div class="form-field full"><label for="pf_delivery">Delivery estimate</label><input type="text" id="pf_delivery" value="3-5 Days"></div>
+          </div>
+
+          <p style="font-size:13px; font-weight:700; color:var(--ink-soft); margin:22px 0 10px; text-transform:uppercase; letter-spacing:0.04em;">Product Details</p>
+          <div class="form-grid">
+            <div class="form-field"><label for="pf_rating">Rating (0–5)</label><input type="number" id="pf_rating" min="0" max="5" step="0.1" value="4.5"></div>
+            <div class="form-field"><label for="pf_reviews">Number of Reviews</label><input type="number" id="pf_reviews" min="0" value="0"></div>
+            <div class="form-field full">
+              <label for="pf_specs">Specifications (one per line: "Key: Value" — also use this for ingredients or size/options)</label>
+              <textarea id="pf_specs" rows="3" placeholder="Battery: 32 hrs&#10;Ingredients: Aloe Vera, Vitamin E&#10;Sizes: 30ml, 50ml" style="width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-s); font-family:inherit; font-size:14px;"></textarea>
+            </div>
+            <div class="form-field full"><label for="pf_shipping">Shipping information</label><input type="text" id="pf_shipping" value="Free delivery on orders above ₹499."></div>
+            <div class="form-field full"><label for="pf_returns">Return information</label><input type="text" id="pf_returns" value="10-day easy return if unopened and in original packaging."></div>
+          </div>
+
+          <div class="admin-form-actions">
+            <button type="submit" class="btn btn-dark">Save Product</button>
+            <button type="button" class="btn btn-outline" id="cancelProductForm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete confirmation modal -->
+    <div id="confirmModalBackdrop" style="display:none; position:fixed; inset:0; background:rgba(21,20,17,0.5); z-index:95; align-items:center; justify-content:center; padding:20px;">
+      <div class="admin-card" style="max-width:400px; width:100%; margin-bottom:0; text-align:center;">
+        <h3 style="margin-bottom:10px;">Are you sure you want to delete this product?</h3>
+        <p id="confirmModalText" style="font-size:13.5px; color:var(--ink-soft); margin-bottom:20px;"></p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+          <button class="btn btn-outline" id="confirmCancelBtn">Cancel</button>
+          <button class="btn btn-dark" id="confirmDeleteBtn" style="background:var(--danger);">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="admin-panel-view" id="view-categories">
+      <div class="admin-card">
+        <h3>Categories</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin-top:-8px; margin-bottom:16px;">Product counts are computed live from the shared product store.</p>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Category</th><th>Products</th><th>In Stock</th><th>Out of Stock</th></tr></thead>
+            <tbody id="categoriesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory -->
+    <div class="admin-panel-view" id="view-inventory">
+      <div class="admin-card">
+        <h3>Inventory</h3>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin-top:-8px; margin-bottom:16px;">Edit stock or low-stock threshold directly — saves immediately to the shared store.</p>
+        <div class="filter-tabs" id="inventoryStatusTabs" style="margin-bottom:16px;">
+          <button class="active" data-status="all">All</button>
+          <button data-status="in">In Stock</button>
+          <button data-status="low">Low Stock</button>
+          <button data-status="out">Out of Stock</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Product</th><th>Category</th><th>Stock</th><th>Low Stock Threshold</th><th>Status</th></tr></thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="admin-panel-view" id="view-settings">
+      <div class="admin-card" style="max-width:520px;">
+        <h3>Store Settings</h3>
+        <form id="settingsForm" novalidate>
+          <div class="form-grid">
+            <div class="form-field full">
+              <label for="st_whatsapp">WhatsApp order number (digits only, with country code)</label>
+              <input type="text" id="st_whatsapp" placeholder="919526226011">
+            </div>
+            <div class="form-field">
+              <label for="st_freeShip">Free shipping threshold (₹)</label>
+              <input type="number" id="st_freeShip" min="0">
+            </div>
+            <div class="form-field">
+              <label for="st_shipFee">Shipping fee (₹)</label>
+              <input type="number" id="st_shipFee" min="0">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-dark" style="margin-top:18px;">Save Settings</button>
+        </form>
+        <p style="font-size:12.5px; color:var(--ink-soft); margin-top:14px;">These apply immediately across the storefront — checkout's WhatsApp button and Cart's shipping calculation both read these live.</p>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="admin-panel-view" id="view-orders">
+      <div class="admin-card">
+        <h3>All Orders</h3>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Payment</th><th>Status</th></tr></thead>
+            <tbody id="ordersBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="ordersNoOrders" style="display:none; padding:40px 0;">
+          <h3>No orders yet</h3>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customers -->
+    <div class="admin-panel-view" id="view-customers">
+      <div class="admin-card">
+        <h3>Customers</h3>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead><tr><th>Name</th><th>Phone</th><th>Orders</th><th>Total Spent</th></tr></thead>
+            <tbody id="customersBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="customersEmpty" style="display:none; padding:40px 0;">
+          <h3>No customers yet</h3>
+          <p>Customers appear here once an order has been placed.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script>
+  const ORDER_STATUSES = ['Order Placed','Confirmed','Processing','Packed','Shipped','Out for Delivery','Delivered','Cancelled'];
+
+  // nav switching
+  document.getElementById('adminNav').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    document.querySelectorAll('#adminNav button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.admin-panel-view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + btn.dataset.panel).classList.add('active');
+    document.getElementById('adminTitle').textContent = btn.textContent.trim();
+  });
+
+  function computeStats(){
+    const orders = getOrders();
+    const products = getProducts();
+    const revenue = orders.reduce((s,o) => s + o.total, 0);
+    const customerKeys = new Set(orders.map(o => (o.address?.email || o.address?.phone || 'unknown')));
+
+    let inStock = 0, lowStock = 0, outOfStock = 0;
+    products.forEach(p => {
+      const status = getStockStatus(p).cls;
+      if(status === 'in') inStock++;
+      else if(status === 'low') lowStock++;
+      else outOfStock++;
+    });
+
+    document.getElementById('statTotalProducts').textContent = products.length;
+    document.getElementById('statInStock').textContent = inStock;
+    document.getElementById('statLowStock').textContent = lowStock;
+    document.getElementById('statOutOfStock').textContent = outOfStock;
+    document.getElementById('statOrders').textContent = orders.length;
+    document.getElementById('statRevenue').textContent = formatPrice(revenue);
+    document.getElementById('statCustomers').textContent = customerKeys.size;
+
+    const recent = orders.slice(0, 6);
+    document.getElementById('dashNoOrders').style.display = recent.length ? 'none' : '';
+    if(recent.length){
+      document.getElementById('recentOrdersBody').innerHTML = recent.map(o => `
+        <tr>
+          <td>${o.orderNumber}</td>
+          <td>${o.address?.fullName || '—'}</td>
+          <td>${formatPrice(o.total)}</td>
+          <td><span class="order-status-pill ${o.status==='Cancelled'?'cancelled':(o.status==='Confirmed'||o.status==='Order Placed')?'pending':''}">${o.status}</span></td>
+          <td>${new Date(o.placedAt).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</td>
+        </tr>`).join('');
+    }
+  }
+
+  let productSearchTerm = '';
+  let productStatusFilter = 'all';
+
+  function renderProducts(){
+    const all = getProducts();
+    const term = productSearchTerm.trim().toLowerCase();
+    let filtered = term
+      ? all.filter(p =>
+          p.name.toLowerCase().includes(term) ||
+          p.brand.toLowerCase().includes(term) ||
+          categoryName(p.category).toLowerCase().includes(term) ||
+          String(p.id) === term)
+      : all;
+    if(productStatusFilter !== 'all'){
+      filtered = filtered.filter(p => getStockStatus(p).cls === productStatusFilter);
+    }
+
+    document.getElementById('productsEmpty').style.display = filtered.length ? 'none' : '';
+
+    document.getElementById('productsBody').innerHTML = filtered.map(p => {
+      const status = getStockStatus(p);
+      return `
+      <tr>
+        <td><img src="${p.images[0] || ''}" alt="${p.name}"></td>
+        <td>${p.name}</td>
+        <td>${p.id}</td>
+        <td>${categoryName(p.category)}</td>
+        <td>${formatPrice(p.price)}</td>
+        <td>
+          <input type="number" min="0" value="${p.stock}" style="width:64px; padding:5px 8px; border:1px solid var(--line); border-radius:4px;"
+            onchange="updateStock(${p.id}, this.value)">
+        </td>
+        <td><span class="stock-pill ${status.cls}">${status.label}</span></td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn-outline btn-sm" onclick="openEditProduct(${p.id})">Edit</button>
+          <button class="btn btn-outline btn-sm" style="color:var(--danger); border-color:var(--danger);" onclick="handleDeleteProduct(${p.id})">Delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('productSearch').addEventListener('input', (e) => {
+    productSearchTerm = e.target.value;
+    renderProducts();
+  });
+
+  document.querySelectorAll('#productStatusTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#productStatusTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      productStatusFilter = btn.dataset.status;
+      renderProducts();
+    });
+  });
+
+  // Stock edits save to the shared product store immediately — this is what
+  // Shop, Product Details and Cart all read, not a separate demo copy.
+  function updateStock(id, value){
+    const updated = updateProduct(id, { stock: Math.max(0, Number(value)) });
+    if(updated){
+      renderProducts();
+      renderInventory();
+      renderCategories();
+      computeStats();
+      showToast(`${updated.name} stock updated to ${updated.stock}`);
+    }
+  }
+
+  // ---------------- Add / Edit product modal ----------------
+  const CATEGORY_SELECT_HTML = CATEGORIES.map(c => `<option value="${c.slug}">${c.name}</option>`).join('');
+  document.getElementById('pf_category').innerHTML = CATEGORY_SELECT_HTML;
+
+  function openProductModal(){ document.getElementById('productModalBackdrop').style.display = 'flex'; }
+  function closeProductModal(){ document.getElementById('productModalBackdrop').style.display = 'none'; document.getElementById('productForm').reset(); document.getElementById('pf_id').value = ''; updateDiscountDisplay(); }
+
+  function updateDiscountDisplay(){
+    const price = Number(document.getElementById('pf_price').value);
+    const was = Number(document.getElementById('pf_was').value);
+    const el = document.getElementById('pf_discountDisplay');
+    if(price > 0 && was > price){
+      const pct = Math.round((1 - price / was) * 100);
+      el.textContent = `${pct}% off (₹${was - price} saved)`;
+    } else {
+      el.textContent = 'No discount';
+    }
+  }
+  document.getElementById('pf_price').addEventListener('input', updateDiscountDisplay);
+  document.getElementById('pf_was').addEventListener('input', updateDiscountDisplay);
+
+  function specsToText(specs){
+    if(!specs) return '';
+    return Object.entries(specs).map(([k,v]) => `${k}: ${v}`).join('\n');
+  }
+  function textToSpecs(text){
+    const specs = {};
+    text.split('\n').forEach(line => {
+      const idx = line.indexOf(':');
+      if(idx === -1) return;
+      const key = line.slice(0, idx).trim();
+      const value = line.slice(idx + 1).trim();
+      if(key && value) specs[key] = value;
+    });
+    return specs;
+  }
+
+  function openAddProductForm(){
+    document.getElementById('productModalTitle').textContent = 'Add Product';
+    document.getElementById('productForm').reset();
+    document.getElementById('pf_id').value = '';
+    document.getElementById('pf_idDisplay').value = '(auto-generated on save)';
+    document.getElementById('pf_brand').value = 'Daily Deals';
+    document.getElementById('pf_delivery').value = '3-5 Days';
+    document.getElementById('pf_lowStock').value = 10;
+    document.getElementById('pf_rating').value = 4.5;
+    document.getElementById('pf_reviews').value = 0;
+    document.getElementById('pf_shipping').value = 'Free delivery on orders above ₹499.';
+    document.getElementById('pf_returns').value = '10-day easy return if unopened and in original packaging.';
+    updateDiscountDisplay();
+    openProductModal();
+  }
+  document.getElementById('openAddProduct').addEventListener('click', openAddProductForm);
+  document.getElementById('cancelProductForm').addEventListener('click', closeProductModal);
+  document.getElementById('productModalBackdrop').addEventListener('click', (e) => {
+    if(e.target.id === 'productModalBackdrop') closeProductModal();
+  });
+
+  function openEditProduct(id){
+    const p = getProductById(id);
+    if(!p) return;
+    document.getElementById('productModalTitle').textContent = 'Edit Product';
+    document.getElementById('pf_id').value = p.id;
+    document.getElementById('pf_idDisplay').value = p.id;
+    document.getElementById('pf_name').value = p.name;
+    document.getElementById('pf_brand').value = p.brand;
+    document.getElementById('pf_category').value = p.category;
+    document.getElementById('pf_short').value = p.shortDescription || '';
+    document.getElementById('pf_desc').value = p.description || '';
+    document.getElementById('pf_price').value = p.price;
+    document.getElementById('pf_was').value = p.was || '';
+    document.getElementById('pf_image').value = (p.images && p.images[0]) || '';
+    document.getElementById('pf_extraImages').value = (p.images && p.images.slice(1).join('\n')) || '';
+    document.getElementById('pf_stock').value = p.stock;
+    document.getElementById('pf_lowStock').value = p.lowStockThreshold != null ? p.lowStockThreshold : 10;
+    document.getElementById('pf_delivery').value = p.delivery;
+    document.getElementById('pf_rating').value = p.rating != null ? p.rating : 4.5;
+    document.getElementById('pf_reviews').value = p.reviews != null ? p.reviews : 0;
+    document.getElementById('pf_specs').value = specsToText(p.specs);
+    document.getElementById('pf_shipping').value = p.shipping || '';
+    document.getElementById('pf_returns').value = p.returns || '';
+    updateDiscountDisplay();
+    openProductModal();
+  }
+
+  document.getElementById('productForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('pf_id').value;
+    const name = document.getElementById('pf_name').value.trim();
+    const category = document.getElementById('pf_category').value;
+    const price = Number(document.getElementById('pf_price').value);
+    const stock = document.getElementById('pf_stock').value;
+    const imageUrl = document.getElementById('pf_image').value.trim();
+
+    if(!name || !category || !price || price <= 0 || stock === '' || !imageUrl){
+      showToast('Product could not be saved. Please check the required fields (name, category, price, stock, main image).');
+      return;
+    }
+
+    const extraImages = document.getElementById('pf_extraImages').value
+      .split('\n').map(s => s.trim()).filter(Boolean);
+
+    const payload = {
+      name,
+      brand: document.getElementById('pf_brand').value.trim() || 'Daily Deals',
+      category,
+      price,
+      was: document.getElementById('pf_was').value ? Number(document.getElementById('pf_was').value) : null,
+      stock: Math.max(0, Number(stock)),
+      lowStockThreshold: Math.max(0, Number(document.getElementById('pf_lowStock').value) || 10),
+      delivery: document.getElementById('pf_delivery').value.trim() || '3-5 Days',
+      images: [imageUrl, ...extraImages],
+      shortDescription: document.getElementById('pf_short').value.trim(),
+      description: document.getElementById('pf_desc').value.trim() || document.getElementById('pf_short').value.trim(),
+      rating: Math.min(5, Math.max(0, Number(document.getElementById('pf_rating').value) || 0)),
+      reviews: Math.max(0, Number(document.getElementById('pf_reviews').value) || 0),
+      specs: textToSpecs(document.getElementById('pf_specs').value),
+      shipping: document.getElementById('pf_shipping').value.trim() || 'Free delivery on orders above ₹499.',
+      returns: document.getElementById('pf_returns').value.trim() || '10-day easy return if unopened and in original packaging.',
+    };
+    payload.badge = payload.was ? 'sale' : null;
+
+    let saved;
+    if(id){
+      saved = updateProduct(id, payload);
+      if(!saved){ showToast('Product could not be saved — it may have been deleted elsewhere.'); return; }
+      showToast(`${saved.name} updated — live on the storefront now`);
+    } else {
+      saved = addProduct(payload);
+      showToast(`${saved.name} added (ID ${saved.id}) — now visible on Shop and Product Details`);
+    }
+    closeProductModal();
+    renderProducts();
+    renderInventory();
+    renderCategories();
+    computeStats();
+  });
+
+  let pendingDeleteId = null;
+
+  function handleDeleteProduct(id){
+    const p = getProductById(id);
+    if(!p) return;
+    pendingDeleteId = id;
+    document.getElementById('confirmModalText').textContent = `"${p.name}" will be removed from Admin, Shop, Search and Categories immediately. This cannot be undone.`;
+    document.getElementById('confirmModalBackdrop').style.display = 'flex';
+  }
+
+  document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+    pendingDeleteId = null;
+    document.getElementById('confirmModalBackdrop').style.display = 'none';
+  });
+  document.getElementById('confirmModalBackdrop').addEventListener('click', (e) => {
+    if(e.target.id === 'confirmModalBackdrop'){
+      pendingDeleteId = null;
+      document.getElementById('confirmModalBackdrop').style.display = 'none';
+    }
+  });
+  document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+    if(pendingDeleteId == null) return;
+    const p = getProductById(pendingDeleteId);
+    deleteProduct(pendingDeleteId);
+    document.getElementById('confirmModalBackdrop').style.display = 'none';
+    pendingDeleteId = null;
+    renderProducts();
+    renderInventory();
+    renderCategories();
+    computeStats();
+    showToast(p ? `${p.name} deleted` : 'Product deleted');
+  });
+
+  function renderOrders(){
+    const orders = getOrders();
+    if(orders.length === 0){
+      document.getElementById('ordersNoOrders').style.display = '';
+      return;
+    }
+    document.getElementById('ordersBody').innerHTML = orders.map(o => {
+      const itemCount = o.items.reduce((s,i)=>s+i.quantity,0);
+      return `
+      <tr>
+        <td>${o.orderNumber}</td>
+        <td>${o.address?.fullName || '—'}</td>
+        <td>${itemCount}</td>
+        <td>${formatPrice(o.total)}</td>
+        <td>${o.paymentMethod}</td>
+        <td>
+          <select onchange="updateOrderStatus('${o.orderNumber}', this.value)" style="padding:6px 8px; border:1px solid var(--line); border-radius:4px; font-family:inherit; font-size:13px;">
+            ${ORDER_STATUSES.map(s => `<option value="${s}" ${s===o.status?'selected':''}>${s}</option>`).join('')}
+          </select>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function updateOrderStatus(orderNumber, newStatus){
+    const orders = getOrders();
+    const order = orders.find(o => o.orderNumber === orderNumber);
+    if(!order) return;
+    order.status = newStatus;
+    writeJSONOrders(orders);
+    showToast(`${orderNumber} marked as ${newStatus}`);
+    computeStats();
+  }
+
+  // store.js doesn't expose a raw orders writer publicly since pages normally
+  // only append via createOrder() — admin needs to persist a status edit, so
+  // write directly to the same key it reads from.
+  function writeJSONOrders(orders){
+    localStorage.setItem('dailyDealsOrders', JSON.stringify(orders));
+  }
+
+  function renderCustomers(){
+    const orders = getOrders();
+    const map = new Map();
+    orders.forEach(o => {
+      const key = o.address?.phone || o.address?.email || o.orderNumber;
+      if(!map.has(key)){
+        map.set(key, { name: o.address?.fullName || 'Guest', phone: o.address?.phone || '—', orders: 0, spent: 0 });
+      }
+      const c = map.get(key);
+      c.orders += 1;
+      c.spent += o.total;
+    });
+    const customers = Array.from(map.values());
+    if(customers.length === 0){
+      document.getElementById('customersEmpty').style.display = '';
+      return;
+    }
+    document.getElementById('customersBody').innerHTML = customers.map(c => `
+      <tr>
+        <td>${c.name}</td>
+        <td>${c.phone}</td>
+        <td>${c.orders}</td>
+        <td>${formatPrice(c.spent)}</td>
+      </tr>`).join('');
+  }
+
+  function renderCategories(){
+    const products = getProducts();
+    document.getElementById('categoriesBody').innerHTML = CATEGORIES.map(c => {
+      const inCat = products.filter(p => p.category === c.slug);
+      const inStock = inCat.filter(p => getStockStatus(p).cls !== 'out').length;
+      const outOfStock = inCat.length - inStock;
+      return `
+      <tr>
+        <td>${c.name}</td>
+        <td>${inCat.length}</td>
+        <td>${inStock}</td>
+        <td>${outOfStock}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  let inventoryStatusFilter = 'all';
+
+  function renderInventory(){
+    let all = getProducts();
+    if(inventoryStatusFilter !== 'all'){
+      all = all.filter(p => getStockStatus(p).cls === inventoryStatusFilter);
+    }
+    document.getElementById('inventoryBody').innerHTML = all.map(p => {
+      const status = getStockStatus(p);
+      return `
+      <tr>
+        <td>${p.name}</td>
+        <td>${categoryName(p.category)}</td>
+        <td>
+          <input type="number" min="0" value="${p.stock}" style="width:64px; padding:5px 8px; border:1px solid var(--line); border-radius:4px;"
+            onchange="updateStock(${p.id}, this.value)">
+        </td>
+        <td>
+          <input type="number" min="0" value="${p.lowStockThreshold != null ? p.lowStockThreshold : 10}" style="width:64px; padding:5px 8px; border:1px solid var(--line); border-radius:4px;"
+            onchange="updateLowStockThreshold(${p.id}, this.value)">
+        </td>
+        <td><span class="stock-pill ${status.cls}">${status.label}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  function updateLowStockThreshold(id, value){
+    const updated = updateProduct(id, { lowStockThreshold: Math.max(0, Number(value)) });
+    if(updated){ renderInventory(); renderProducts(); computeStats(); showToast(`${updated.name} low-stock threshold updated`); }
+  }
+
+  document.querySelectorAll('#inventoryStatusTabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#inventoryStatusTabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      inventoryStatusFilter = btn.dataset.status;
+      renderInventory();
+    });
+  });
+
+  // ---------------- Settings ----------------
+  function loadSettingsForm(){
+    const s = getStoreSettings();
+    document.getElementById('st_whatsapp').value = s.whatsappNumber;
+    document.getElementById('st_freeShip').value = s.freeShippingThreshold;
+    document.getElementById('st_shipFee').value = s.shippingFee;
+  }
+  document.getElementById('settingsForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const whatsapp = document.getElementById('st_whatsapp').value.trim();
+    if(!/^\d{10,15}$/.test(whatsapp)){
+      showToast('WhatsApp number should be digits only, with country code (e.g. 919526226011)');
+      return;
+    }
+    saveStoreSettings({
+      whatsappNumber: whatsapp,
+      freeShippingThreshold: Math.max(0, Number(document.getElementById('st_freeShip').value) || 0),
+      shippingFee: Math.max(0, Number(document.getElementById('st_shipFee').value) || 0),
+    });
+    showToast('Settings saved — live across the storefront now');
+  });
+  loadSettingsForm();
+
+  // if products or orders change in another tab (e.g. a customer places an
+  // order on the storefront tab, or another admin session edits a product),
+  // refresh every view that could be affected
+  onProductsChanged(() => {
+    renderProducts();
+    renderInventory();
+    renderCategories();
+    computeStats();
+  });
+  window.addEventListener('storage', (e) => {
+    if(e.key === STORAGE_KEYS.orders){
+      computeStats();
+      renderOrders();
+      renderCustomers();
+    }
+  });
+
+  computeStats();
+  renderProducts();
+  renderInventory();
+  renderCategories();
+  renderOrders();
+  renderCustomers();
+</script>
+</body>
+</html>

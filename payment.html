@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / <a href="checkout.html">Checkout</a> / Payment</div>
+    <h1>Payment</h1>
+  </div>
+</div>
+
+<section class="section-tight">
+  <div class="container">
+
+    <div id="paymentEmpty" class="empty-state" style="display:none;">
+      <h3>Nothing to pay for</h3>
+      <p>Your cart is empty, or you haven't entered a shipping address yet.</p>
+      <a href="cart.html" class="btn btn-dark">Back to Cart</a>
+    </div>
+
+    <div id="paymentFilled" style="display:none;">
+      <div class="checkout-steps">
+        <div class="step done"><div class="circle">✓</div><span class="label">Address</span></div>
+        <div class="line"></div>
+        <div class="step active"><div class="circle">2</div><span class="label">Payment</span></div>
+        <div class="line"></div>
+        <div class="step"><div class="circle">3</div><span class="label">Confirmation</span></div>
+      </div>
+
+      <div class="checkout-layout">
+        <div class="form-card">
+          <h3>Choose payment method</h3>
+
+          <label class="payment-option selected" data-method="Online">
+            <input type="radio" name="paymentMethod" value="Online" checked>
+            <div>
+              <div class="p-name">UPI / Cards / Net Banking</div>
+              <div class="p-desc">Pay securely via Razorpay. Supports UPI, all major cards and net banking.</div>
+            </div>
+          </label>
+
+          <label class="payment-option" data-method="COD">
+            <input type="radio" name="paymentMethod" value="COD">
+            <div>
+              <div class="p-name">Cash on Delivery</div>
+              <div class="p-desc">Pay in cash when your order arrives.</div>
+            </div>
+          </label>
+
+          <label class="payment-option" data-method="PayPal">
+            <input type="radio" name="paymentMethod" value="PayPal">
+            <div>
+              <div class="p-name">PayPal</div>
+              <div class="p-desc">Pay using your PayPal balance or linked card.</div>
+            </div>
+          </label>
+
+          <div style="margin-top:22px; padding:14px 16px; background:var(--paper-alt); border-radius:var(--radius-s); font-size:12.5px; color:var(--ink-soft);">
+            This is a frontend demo — no real payment gateway is connected yet. Clicking pay below simulates a successful payment so you can see the full order flow. No card or bank details are collected or should be entered here.
+          </div>
+
+          <button class="btn btn-primary btn-block" id="payBtn" style="margin-top:20px;">
+            <span id="payBtnLabel">Pay</span>
+          </button>
+        </div>
+
+        <div class="summary-box">
+          <h3>Order Summary</h3>
+          <div id="summaryLines" style="margin-bottom:16px;"></div>
+          <div class="summary-row"><span>Subtotal</span><span id="sumSubtotal"></span></div>
+          <div class="summary-row"><span>Shipping</span><span id="sumShipping"></span></div>
+          <div class="summary-row" id="discountRow" style="display:none;"><span>Discount</span><span id="sumDiscount"></span></div>
+          <div class="summary-row total"><span>Total</span><span id="sumTotal"></span></div>
+          <div style="margin-top:16px; font-size:12.5px; color:var(--ink-soft);">
+            Shipping to: <span id="shipToName"></span>, <span id="shipToCity"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('shop');
+  renderFooter();
+
+  const address = readJSON('dailyDealsCheckoutAddress', null);
+  const { lines, subtotal, shipping, discount, total } = getCartTotals();
+
+  if(lines.length === 0 || !address){
+    document.getElementById('paymentEmpty').style.display = '';
+  } else {
+    document.getElementById('paymentFilled').style.display = '';
+
+    document.getElementById('summaryLines').innerHTML = lines.map(l => `
+      <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--ink-soft); margin-bottom:8px;">
+        <span>${l.product.name} × ${l.quantity}</span><span>${formatPrice(l.lineTotal)}</span>
+      </div>`).join('');
+    document.getElementById('sumSubtotal').textContent = formatPrice(subtotal);
+    document.getElementById('sumShipping').textContent = shipping === 0 ? 'Free' : formatPrice(shipping);
+    document.getElementById('sumTotal').textContent = formatPrice(total);
+    if(discount > 0){
+      document.getElementById('discountRow').style.display = '';
+      document.getElementById('sumDiscount').textContent = '−' + formatPrice(discount);
+    }
+    document.getElementById('shipToName').textContent = address.fullName;
+    document.getElementById('shipToCity').textContent = address.city;
+    document.getElementById('payBtnLabel').textContent = 'Pay ' + formatPrice(total);
+  }
+
+  let selectedMethod = 'Online';
+  document.querySelectorAll('.payment-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      opt.querySelector('input').checked = true;
+      selectedMethod = opt.dataset.method;
+      document.getElementById('payBtnLabel').textContent =
+        selectedMethod === 'COD' ? 'Place Order (Cash on Delivery)' : 'Pay ' + formatPrice(total);
+    });
+  });
+
+  document.getElementById('payBtn').addEventListener('click', () => {
+    const btn = document.getElementById('payBtn');
+    btn.disabled = true;
+    document.getElementById('payBtnLabel').textContent = 'Processing...';
+
+    // Simulated payment — see the notice above. A real integration would
+    // create a Razorpay order server-side and verify the signature before
+    // this point; nothing here should be mistaken for that.
+    setTimeout(() => {
+      const paymentMethodLabel = selectedMethod === 'COD' ? 'COD' : selectedMethod;
+      const order = createOrder(address, paymentMethodLabel);
+      if(!order){
+        showToast('Something went wrong creating your order');
+        btn.disabled = false;
+        return;
+      }
+      localStorage.removeItem('dailyDealsCheckoutAddress');
+      window.location.href = 'confirmation.html?order=' + encodeURIComponent(order.orderNumber);
+    }, 900);
+  });
+</script>
+</body>
+</html>

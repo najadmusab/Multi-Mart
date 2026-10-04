@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div id="notFound" class="empty-state" style="display:none; padding:100px 24px;">
+  <h3>Order Not Found</h3>
+  <p>We couldn't find that order on this device.</p>
+  <a href="shop.html" class="btn btn-dark">Back to Shop</a>
+</div>
+
+<div id="confirmWrap" class="confirm-wrap" style="display:none;">
+  <div class="confirm-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+  </div>
+  <h1>Order Confirmed!</h1>
+  <p style="color:var(--ink-soft); margin-top:10px;">Thank you for your order. A confirmation has been saved to your account.</p>
+
+  <div class="confirm-order-box">
+    <div class="row"><span>Order ID</span><strong id="cOrderId"></strong></div>
+    <div class="row"><span>Items</span><span id="cItemCount"></span></div>
+    <div class="row"><span>Total paid</span><strong id="cTotal"></strong></div>
+    <div class="row"><span>Payment method</span><span id="cPayment"></span></div>
+    <div class="row"><span>Estimated delivery</span><span id="cDelivery"></span></div>
+  </div>
+
+  <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+    <a href="#" class="btn btn-primary" id="trackBtn">Track Order</a>
+    <a href="shop.html" class="btn btn-outline">Continue Shopping</a>
+  </div>
+</div>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('shop');
+  renderFooter();
+
+  const params = new URLSearchParams(window.location.search);
+  const orderNumber = params.get('order');
+  const order = orderNumber ? getOrderByNumber(orderNumber) : null;
+
+  if(!order){
+    document.getElementById('notFound').style.display = '';
+  } else {
+    document.getElementById('confirmWrap').style.display = '';
+    document.getElementById('cOrderId').textContent = order.orderNumber;
+    const itemCount = order.items.reduce((s,i)=>s+i.quantity, 0);
+    document.getElementById('cItemCount').textContent = itemCount + (itemCount===1?' item':' items');
+    document.getElementById('cTotal').textContent = formatPrice(order.total);
+    document.getElementById('cPayment').textContent = order.paymentMethod === 'COD' ? 'Cash on Delivery' : order.paymentMethod;
+
+    const placed = new Date(order.placedAt);
+    const est = new Date(placed.getTime() + 4*24*60*60*1000);
+    const fmt = (d) => d.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    document.getElementById('cDelivery').textContent = fmt(placed) + ' – ' + fmt(est);
+
+    document.getElementById('trackBtn').href = 'tracking.html?order=' + encodeURIComponent(order.orderNumber);
+  }
+</script>
+</body>
+</html>

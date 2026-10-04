@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wishlist — Daily Deals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="site-header"></div>
+
+<div class="page-head">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / Wishlist</div>
+    <h1>Your Wishlist</h1>
+  </div>
+</div>
+
+<section class="section-tight">
+  <div class="container">
+    <div class="prod-grid" id="wishGrid"></div>
+    <div class="empty-state" id="wishEmpty" style="display:none;">
+      <h3>Your wishlist is empty</h3>
+      <p>Save things you like by tapping the heart on any product.</p>
+      <a href="shop.html" class="btn btn-dark">Browse products</a>
+    </div>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  renderHeader('wishlist');
+  renderFooter();
+
+  function render(){
+    const items = getWishlist().map(id => getProductById(id)).filter(Boolean);
+    if(items.length === 0){
+      document.getElementById('wishGrid').style.display = 'none';
+      document.getElementById('wishEmpty').style.display = '';
+      return;
+    }
+    document.getElementById('wishGrid').style.display = '';
+    document.getElementById('wishEmpty').style.display = 'none';
+
+    document.getElementById('wishGrid').innerHTML = items.map(p => {
+      const isSale = !!p.was;
+      const priceRow = isSale
+        ? `<span class="price-now">${formatPrice(p.price)}</span><span class="price-was">${formatPrice(p.was)}</span>`
+        : `<span class="price-now">${formatPrice(p.price)}</span>`;
+      return `
+      <div class="product-card" data-id="${p.id}">
+        <a class="product-media" href="product.html?id=${p.id}">
+          <button class="wish-btn active" data-remove="${p.id}" aria-label="Remove from wishlist">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7.5-4.9-10-9.3C.4 8.1 2 4.5 5.6 4c2.1-.3 4 .8 6.4 3 2.4-2.2 4.3-3.3 6.4-3 3.6.5 5.2 4.1 3.6 7.7-2.5 4.4-10 9.3-10 9.3z"/></svg>
+          </button>
+          <img src="${p.images[0]}" alt="${p.name}" loading="lazy">
+        </a>
+        <div class="product-body">
+          <div class="product-brand">${p.brand}</div>
+          <a class="product-name" href="product.html?id=${p.id}">${p.name}</a>
+          <div class="product-rating"><span class="stars">${starString(p.rating)}</span> (${p.reviews})</div>
+          <div class="product-price">${priceRow}</div>
+          <button class="add-btn" data-add="${p.id}">${p.stock<1?'Out of stock':'Add to cart'}</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('wishGrid').addEventListener('click', (e) => {
+    const removeBtn = e.target.closest('[data-remove]');
+    const addBtn = e.target.closest('[data-add]');
+    if(removeBtn){
+      e.preventDefault();
+      const id = Number(removeBtn.dataset.remove);
+      toggleWishlist(id);
+      showToast('Removed from wishlist');
+      render();
+    } else if(addBtn){
+      const id = Number(addBtn.dataset.add);
+      const product = getProductById(id);
+      if(!product || product.stock < 1) return;
+      addToCart(id, 1);
+      showToast(product.name + ' added to cart');
+    }
+  });
+
+  render();
+</script>
+</body>
+</html>
